@@ -1,0 +1,42 @@
+name: CI/CD Pipeline com Firebase
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Instalar dependências
+        run: npm install
+
+      - name: Executar testes
+        run: npm test
+
+      - name: Build da aplicação
+        run: npm run build
+
+      - name: Configurar Firebase (Variáveis de Ambiente)
+        run: |
+          echo "FIREBASE_API_KEY=${{ secrets.FIREBASE_API_KEY }}" >> $GITHUB_ENV
+          echo "FIREBASE_PROJECT_ID=devflow-firebase-app" >> $GITHUB_ENV
+
+      - name: Testar Firebase (Auth e Firestore)
+        run: node test-firebase.js
+
+      - name: Deploy (Simulado)
+        run: echo "Deploy realizado com sucesso!"
